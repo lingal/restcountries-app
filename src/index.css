@@ -1,13 +1,104 @@
-body {
+@import url('https://fonts.googleapis.com/css2?family=Nunito&display=swap');
+
+* {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+body {
+  font-family: 'Nunito', sans-serif;
+  background-image: linear-gradient(to top left, #753682 0%, #bf2e34 100%);
+  color: #fff;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+label {
+  margin-inline: 1rem;
+}
+
+.reset {
+  visibility: hidden;
+}
+.show-reset {
+  visibility: visible;
+}
+
+header {
+  backdrop-filter: blur(14px) saturate(200%);
+  -webkit-backdrop-filter: blur(14px) saturate(200%);
+  background-color: rgba(18, 18, 18, 0.5);
+  display: grid;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+header .section-width {
+  width: 90vw;
+  max-width: 1200px;
+}
+header h1 {
+  text-transform: capitalize;
+  margin-bottom: 1rem;
+}
+.header-nav {
+  display: flex;
+  justify-content: space-between;
+}
+
+.header-nav button {
+  padding: 0.25rem 2rem;
+  font-size: 0.75rem;
+  border-radius: 10px;
+}
+
+.countries-container {
+  display: grid;
+  gap: 20px;
+  justify-content: center;
+}
+
+.prev-btn,
+.prev-next {
+  position: fixed;
+  top: 50%;
+  transform: translateY(50%);
+  background-color: transparent;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 3rem;
+}
+
+.prev-btn {
+  left: 10%;
+}
+
+.prev-next {
+  right: 10%;
+}
+
+.pages-display {
+  position: fixed;
+  right: 9%;
+  top: 45%;
+  font-size: 2rem;
+}
+
+.country {
+  background-color: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(200px);
+  filter: blur();
+  box-shadow: 0 3rem 5rem rgba(0, 0, 0, 0.25);
+  border-radius: 9px;
+  width: 55rem;
+  padding: 1rem 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  justify-items: center;
+  gap: 1rem;
 }
