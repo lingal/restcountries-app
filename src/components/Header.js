@@ -1,20 +1,22 @@
 import { useState } from 'react';
+import Region from './Region';
+import Area from './Area';
+import Pages from './Pages';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faArrowDownZA,
-  faArrowUpAZ
-} from '@fortawesome/free-solid-svg-icons';
-
+import { faArrowDownZA, faArrowUpAZ } from '@fortawesome/free-solid-svg-icons';
 
 const Header = (props) => {
-  const [descen, setDescen] = useState(false);
+  const { orderHandler, data, region, countries, pageChange, areaSize } = props;
 
-  const changeIcon = () => {
-    if (descen) {
-      setDescen(false);
-    } else {
-      setDescen(true);
-    }
+  const [order, setOrder] = useState('DownZA');
+
+  const showIcon = () => {
+    const icon = order ? (
+      <FontAwesomeIcon icon={faArrowUpAZ} />
+    ) : (
+      <FontAwesomeIcon icon={faArrowDownZA} />
+    );
+    return icon;
   };
 
   return (
@@ -24,18 +26,20 @@ const Header = (props) => {
         <div className="header-nav">
           <button
             onClick={() => {
-              props.data();
-              changeIcon();
+              orderHandler();
+              setOrder((prevState) => !prevState);
             }}
           >
-            {descen ? (
-              <FontAwesomeIcon icon={faArrowDownZA} />
-            ) : (
-              <FontAwesomeIcon icon={faArrowUpAZ} />
-            )}
+            {showIcon()}
           </button>
-          {props.children}
+          <Region data={data} region={region} filterName={'Select region'} />
+          <Area
+            data={data}
+            filterName="Show smaller countries than"
+            areaSize={areaSize}
+          />
         </div>
+        <Pages pages={countries} pageChange={(e) => pageChange(e)} />
       </div>
     </header>
   );

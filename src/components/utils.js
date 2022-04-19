@@ -1,11 +1,11 @@
-const pagination = (data) => {
-  const itemsPerPage = 15;
-  const pages = Math.ceil(data.length / itemsPerPage);
+const paginate = (countries) => {
+  const items = 15;
+  const pages = Math.ceil(countries.length / items);
   const newCountries = Array.from({ length: pages }, (_, index) => {
-    const start = index * itemsPerPage;
-    return data.slice(start, start + itemsPerPage);
+    const start = index * items;
+    return countries.slice(start, start + items);
   });
   return newCountries;
 };
 
-export default pagination;
+export default paginate;

@@ -1,137 +1,87 @@
 import { useState, useEffect } from 'react';
-import FirstResponse from './components/Fetch';
-import pagination from './components/utils';
+import useFetch from './components/useFetch';
+import paginate from './components/utils';
 import Header from './components/Header';
 import Country from './components/Country';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGreaterThan, faLessThan } from '@fortawesome/free-solid-svg-icons';
+import './index.css';
+const url = 'https://restcountries.com/v2/all?fields=name,region,area';
 
 function App() {
-  const { data, loading, setData, data2, reset } = FirstResponse();
-  const [pages, setPages] = useState([0]);
-  const [count, setCount] = useState(0);
-  const [reversed, setReversed] = useState(false);
-  const [filter, setFilter] = useState(null);
-  const [region, setRegion] = useState(null);
-  const regions = new Set(data2.map((item) => item.region));
+  const { data, loading, error } = useFetch(url);
+  const [countries, setCountries] = useState([]);
+  const [order, setOrder] = useState(true);
+  const [page, setPage] = useState(0);
+  const [region, setRegion] = useState('');
+  const [area, setArea] = useState(0);
+
 
   useEffect(() => {
-    if (reversed) {
-      const descData = data.sort((a, b) => b.name.localeCompare(a.name));
-      setData(descData);
+    let newCountries;
+    if (order) {
+      newCountries = data.sort((a, b) => a.name.localeCompare(b.name));
+    } else {
+      newCountries = data.sort((a, b) => b.name.localeCompare(a.name));
     }
-    if (!reversed) {
-      const ascData = data.sort((a, b) => a.name.localeCompare(b.name));
-      setData(ascData);
-    }
-
-    if (filter) {
-      if (data2.length >= 250) {
-        const filterByArea = data2.filter((item) => {
-          if (item.area) {
-            return item.area < Number(filter);
-          } else {
-            return [];
-          }
-        });
-        setData(filterByArea);
-        setFilter(false);
-      } else {
-        setData(data);
-      }
-    }
-
     if (region) {
-      const filterByRegion = data2.filter((item) => item.region === region);
-      setData(filterByRegion);
-      setRegion(false);
+      newCountries = data.filter((item) => {
+        return region !== 'all' ? item.region === region : item;
+      });
+
+      setPage((prevPage) => (prevPage = 0));
     }
-    setPages(pagination(data));
-  }, [data, reversed, setData, filter, data2, region]);
+    if (area) {
+      newCountries = data
+        .filter((item) => {
+          if (area) {
+            return item.area <= area;
+          }
+          if (area === 'all') {
+            setArea((prevArea) => (prevArea = 0));
+          }
+        })
 
-  if (loading) return <h1>loading...</h1>;
+        .sort((a, b) => b.area - a.area);
+    }
 
-  const nextPage = () => {
-    setCount((oldPage) => {
-      let nextPage = oldPage + 1;
-      if (nextPage > pages.length - 1) {
-        nextPage = 0;
-      }
-      return nextPage;
-    });
-  };
+    setCountries(paginate(newCountries));
+  }, [order, region, data, area]);
 
-  const prevPage = () => {
-    setCount((oldPage) => {
-      let prevPage = oldPage - 1;
-      if (prevPage < 0) {
-        prevPage = pages.length - 1;
-      }
-      return prevPage;
-    });
-  };
+  if (loading) {
+    return <h1>Loading...</h1>;
+  }
+
+  if (error) {
+    console.log(error);
+  }
+
+  function getRegion(value) {
+    setRegion(value);
+  }
+
+  function getAreaSize(size) {
+    setArea(Number(size));
+  }
+
+  function getPage(page) {
+    setPage(page);
+  }
 
   return (
-    <>
-      <Header data={() => setReversed(reversed ? false : true)}>
-        <div className="filters">
-          <label htmlFor="area-input">Show smaller countries than:</label>
-          <select
-            id="area-input"
-            onChange={(e) => setFilter(e.currentTarget.value)}
-          >
-            <option>choose country</option>
-            {data2.map((item, id) => (
-              <option key={id} value={item.area}>
-                {item.name}
-              </option>
-            ))}
-          </select>
-          <label htmlFor="region-input"> Sort by region:</label>
-          <select
-            id="region-input"
-            onChange={(e) => setRegion(e.currentTarget.value)}
-          >
-            <option>choose region</option>
-            {[...regions].map((region, id) => (
-              <option key={id}>{region}</option>
-            ))}
-          </select>
-        </div>
-
-        <button
-          className={`button ${
-            region !== null || filter !== null ? 'show-reset' : 'reset'
-          }`}
-          onClick={() => {
-            setData(reset);
-            setRegion(null);
-            setFilter(null);
-          }}
-        >
-          Reset
-        </button>
-      </Header>
-
-      <div className="countries-container">
-        <button onClick={() => prevPage()} className="prev-btn">
-          <FontAwesomeIcon icon={faLessThan} />
-        </button>
-        <button className="prev-next" onClick={() => nextPage()}>
-          <FontAwesomeIcon icon={faGreaterThan} />
-        </button>
-        <div className="pages-display">
-          <p>
-            <span>{count + 1}</span> /<span> {pages.length}</span>
-          </p>
-        </div>
-        {pages[count].map((country, id) => {
-          return <Country key={id} {...country} />;
-        })}
+    <div className='wrapper'>
+      <Header
+        data={data}
+        orderHandler={() => setOrder(!order)}
+        region={getRegion}
+        areaSize={getAreaSize}
+        countries={countries}
+        pageChange={getPage}
+      />
+      <div className='countries-container'>
+      {countries[page]?.map((item) => {
+        return <Country key={item.name} {...item} />;
+      })}
       </div>
-
-      <div className="btns"></div>
-    </>
+    </div>
   );
 }
 
